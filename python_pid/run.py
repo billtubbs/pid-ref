@@ -5,7 +5,6 @@ control system with proper timing and signal handling.
 """
 
 import time
-from .pid import PIDController
 
 
 class PIDRuntime:
@@ -123,8 +122,7 @@ class PIDRuntime:
 
             # Invoke the PID update
             u = self.controller(
-                r, y, uff, uman, utrack, Tx,
-                self.track, self.auto, self.windup
+                r, y, uff, uman, utrack, Tx, self.track, self.auto, self.windup
             )
 
             # Send control signal
@@ -138,26 +136,3 @@ class PIDRuntime:
             sleep_time = self.Ts - elapsed
             if sleep_time > 0:
                 time.sleep(sleep_time)
-
-
-def main():
-    """Example main function demonstrating PID runtime usage."""
-    # Create controller with custom parameters
-    controller = PIDController(kp=1.0, ki=0.5, kd=0.1, TfTs=10.0)
-
-    # Create runtime environment
-    runtime = PIDRuntime(controller=controller, Ts=0.1)
-
-    # Override signal methods for demonstration
-    # (In practice, these would read from actual hardware/sensors)
-
-    print("PID controller running. Press Ctrl+C to stop.")
-    try:
-        runtime.run()
-    except KeyboardInterrupt:
-        print("\nStopping PID controller.")
-        runtime.stop = True
-
-
-if __name__ == "__main__":
-    main()

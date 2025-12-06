@@ -9,6 +9,7 @@ from enum import Enum
 
 class WindupMode(Enum):
     """Windup mode enumeration."""
+
     NONE = "none"
     UPPER = "upper"
     LOWER = "lower"

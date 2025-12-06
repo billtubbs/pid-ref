@@ -30,12 +30,11 @@ def pid_update(
     Tx=1.0,
     track=False,
     auto=True,
-    windup=None
+    windup=None,
 ):
     """PID control signal update.
 
-    This is a standalone function implementing the incremental PID
-    algorithm.
+    Pure function to implement the incremental PID algorithm.
 
     Args:
         r: Reference (setpoint) signal
@@ -120,10 +119,10 @@ class PIDController:
         ki,
         kd,
         TfTs=10.0,
-        umin=-float('inf'),
-        umax=float('inf'),
+        umin=-float("inf"),
+        umax=float("inf"),
         u0=0.0,
-        b=1.0
+        b=1.0,
     ):
         """Initialize the PID controller.
 
@@ -166,7 +165,7 @@ class PIDController:
         Tx=1.0,
         track=False,
         auto=True,
-        windup=None
+        windup=None,
     ):
         """Compute the PID control signal.
 
@@ -190,11 +189,27 @@ class PIDController:
         # Call standalone PID update function
         u, self.u_old, self.up_old, self.ud_old, self.uff_old, self.b = (
             pid_update(
-                r, yf, dyf,
-                self.kp, self.ki, self.kd,
-                self.umin, self.umax, self.u0, self.b,
-                self.u_old, self.up_old, self.ud_old, self.uff_old,
-                uff, uman, utrack, Tx, track, auto, windup
+                r,
+                yf,
+                dyf,
+                self.kp,
+                self.ki,
+                self.kd,
+                self.umin,
+                self.umax,
+                self.u0,
+                self.b,
+                self.u_old,
+                self.up_old,
+                self.ud_old,
+                self.uff_old,
+                uff,
+                uman,
+                utrack,
+                Tx,
+                track,
+                auto,
+                windup,
             )
         )
 

@@ -9,18 +9,7 @@ from .zoh_pid import zoh_Fy
 
 
 def filter_update(
-    y,
-    yf,
-    dyf,
-    a11,
-    a12,
-    a21,
-    a22,
-    b1,
-    b2,
-    TfTs,
-    Tx=1.0,
-    Tx_old=None
+    y, yf, dyf, a11, a12, a21, a22, b1, b2, TfTs, Tx=1.0, Tx_old=None
 ):
     """Pure function for measurement filter update.
 
@@ -101,12 +90,30 @@ class MeasurementFilter:
         """
         # Call standalone filter update function
         result = filter_update(
-            y, self.yf, self.dyf,
-            self.a11, self.a12, self.a21, self.a22, self.b1, self.b2,
-            self.TfTs, Tx, self.Tx_old
+            y,
+            self.yf,
+            self.dyf,
+            self.a11,
+            self.a12,
+            self.a21,
+            self.a22,
+            self.b1,
+            self.b2,
+            self.TfTs,
+            Tx,
+            self.Tx_old,
         )
-        (self.yf, self.dyf, self.a11, self.a12, self.a21, self.a22,
-         self.b1, self.b2, self.Tx_old) = result
+        (
+            self.yf,
+            self.dyf,
+            self.a11,
+            self.a12,
+            self.a21,
+            self.a22,
+            self.b1,
+            self.b2,
+            self.Tx_old,
+        ) = result
 
         return self.yf, self.dyf
 

@@ -5,16 +5,17 @@ discrete-time filter parameters used in the PID controller's
 measurement filter.
 """
 
-import numpy as np
+import math
 
 
-def zoh_Fy(TfTs, Tx=1.0):
+def zoh_Fy(TfTs, Tx=1.0, exp=math.exp):
     """Compute filter parameters using zero-order hold discretization.
 
     Args:
         TfTs: Filter time constant as a multiple of nominal sample
               time
         Tx: Execution period (normalized, default: 1.0)
+        exp: Exponential function (default: math.exp)
 
     Returns:
         tuple: Six state-space matrix coefficients
@@ -22,7 +23,7 @@ def zoh_Fy(TfTs, Tx=1.0):
     """
     # Help variables
     h1 = Tx / TfTs
-    h2 = np.exp(-h1)
+    h2 = exp(-h1)
     h3 = h1 * h2
     h4 = h3 / TfTs
 
