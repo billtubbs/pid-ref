@@ -153,7 +153,8 @@ Current test cases include:
 | P_step | P | P-only with step reference and random measurement |
 | PI_step | PI | PI controller with step reference |
 | PID_step | PID | Full PID with step reference |
-| PID_antiwindup_step | PID_saturated | PID with saturation limits |
+| PID_step_irregular_time | PID | PID with irregular time intervals (adaptive timing) |
+| PID_antiwindup_step | PID_saturated | PID with saturation limits (anti-windup) |
 | PI_switch_manual | PI | Tests auto/manual mode switching |
 | PI_switch_track | PI | Tests tracking mode for bumpless transfer |
 
@@ -217,10 +218,41 @@ inputs_spec:
   r: ramp.csv
 ```
 
+## C++ Tests
+
+The same I/O data files are used to test the C++ implementation, enabling cross-language validation.
+
+### Prerequisites
+
+1. Download Catch2 v2.x single-header file:
+```bash
+cd tests
+wget https://github.com/catchorg/Catch2/releases/download/v2.13.10/catch.hpp
+```
+
+2. Generate I/O data (if not already done):
+```bash
+python3 tests/generate_io_data.py
+```
+
+### Running C++ Tests
+
+```bash
+cd tests
+make test
+```
+
+Or with verbose output:
+```bash
+make test-verbose
+```
+
+The C++ tests (`test_cpp_pid.cpp`) use the same CSV files as the Python tests, ensuring both implementations produce identical results.
+
 ## Reusability
 
 The modular structure enables:
-- **Cross-language validation**: CSV files can be used by MATLAB, Julia, etc.
+- **Cross-language validation**: CSV files can be used by MATLAB, Julia, C++, etc.
 - **Implementation testing**: Verify any PID implementation with same data
 - **Benchmarking**: Compare performance across implementations
 - **Version control**: Track controller configs and expected outputs
