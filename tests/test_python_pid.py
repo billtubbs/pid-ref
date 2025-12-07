@@ -1,6 +1,6 @@
 """Parametrized unit tests for PID controller.
 
-Tests the PID controller with predefined error signals and verifies
+Tests the PID controller with comprehensive input signals and verifies
 outputs match expected values from CSV files.
 
 Test cases are loaded from test_cases.yaml and I/O data from CSV files.
@@ -27,39 +27,56 @@ def load_test_cases():
 
     # Build test cases list
     test_cases = []
-    for tc in config["test_cases"]:
+    for test_name, test_spec in config["test_cases"].items():
         test_case = {
-            "name": tc["name"],
-            "controller": config["controllers"][tc["controller"]],
-            "file": tc["file"],
+            "name": test_name,
+            "controller": config["controllers"][test_spec["controller"]],
+            "io_data": test_spec["io_data"],
         }
         test_cases.append(test_case)
 
     return test_cases
 
 
-def load_csv_data(csv_file):
-    """Load error and control signals from CSV file.
+def load_io_data(csv_file):
+    """Load complete input-output data from CSV file.
+
+    Expected CSV columns: r, y, uff, uman, utrack, Tx, auto, track, u
 
     Args:
-        csv_file: Path to CSV file with columns e,u
+        csv_file: Path to CSV file
 
     Returns:
-        tuple: (errors, controls) as lists
+        dict: Dictionary with keys for each column containing lists
     """
-    errors = []
-    controls = []
+    import csv
+
+    data = {
+        "r": [],
+        "y": [],
+        "uff": [],
+        "uman": [],
+        "utrack": [],
+        "Tx": [],
+        "auto": [],
+        "track": [],
+        "u": [],
+    }
 
     with open(csv_file, "r", encoding="utf-8") as f:
-        # Skip header
-        next(f)
-        # Read data
-        for line in f:
-            e, u = line.strip().split(",")
-            errors.append(float(e))
-            controls.append(float(u))
+        reader = csv.DictReader(f)
+        for row in reader:
+            data["r"].append(float(row["r"]))
+            data["y"].append(float(row["y"]))
+            data["uff"].append(float(row["uff"]))
+            data["uman"].append(float(row["uman"]))
+            data["utrack"].append(float(row["utrack"]))
+            data["Tx"].append(float(row["Tx"]))
+            data["auto"].append(row["auto"].lower() == "true")
+            data["track"].append(row["track"].lower() == "true")
+            data["u"].append(float(row["u"]))
 
-    return errors, controls
+    return data
 
 
 # Load test cases from YAML
@@ -68,21 +85,20 @@ TEST_CASES = load_test_cases()
 
 @pytest.mark.parametrize("test_case", TEST_CASES, ids=lambda x: x["name"])
 def test_pid_controller(test_case):
-    """Test PID controller with CSV input-output data.
+    """Test PID controller with comprehensive input-output data.
 
-    Verifies that the controller produces expected outputs for
-    different configurations (P, PI, PID, PID+anti-windup) and
-    error signals (step, random).
+    Loads complete I/O data from CSV (r, y, uff, uman, utrack, Tx,
+    auto, track, u) and verifies controller produces expected outputs.
     """
     # Get CSV file path
-    csv_file = Path(__file__).parent / test_case["file"]
+    csv_file = Path(__file__).parent / test_case["io_data"]
 
     # Skip if CSV file doesn't exist yet
     if not csv_file.exists():
-        pytest.skip(f"CSV file not found: {csv_file}")
+        pytest.skip(f"I/O data file not found: {csv_file}")
 
-    # Load expected I/O data
-    errors, expected_outputs = load_csv_data(csv_file)
+    # Load complete I/O data
+    data = load_io_data(csv_file)
 
     # Get controller configuration
     ctrl = test_case["controller"]
@@ -96,17 +112,26 @@ def test_pid_controller(test_case):
         umax=ctrl["umax"],
     )
 
-    # Run controller on error signal
+    # Run controller with inputs from CSV
     outputs = []
-    for e in errors:
-        # Error = setpoint - measurement, so set r=e, y=0
-        u = controller(r=e, y=0.0, Tx=1.0, auto=True)
+    n_steps = len(data["r"])
+    for i in range(n_steps):
+        u = controller(
+            r=data["r"][i],
+            y=data["y"][i],
+            uff=data["uff"][i],
+            uman=data["uman"][i],
+            utrack=data["utrack"][i],
+            Tx=data["Tx"][i],
+            track=data["track"][i],
+            auto=data["auto"][i],
+        )
         outputs.append(u)
 
     # Verify outputs match expected values (within tolerance)
     np.testing.assert_allclose(
         outputs,
-        expected_outputs,
+        data["u"],
         rtol=1e-10,
         atol=1e-12,
         err_msg=f"Test case {test_case['name']} failed",

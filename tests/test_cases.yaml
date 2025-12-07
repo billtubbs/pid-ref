@@ -36,43 +36,95 @@ controllers:
     umax: 3.0
 
 # Test cases
+# Each test case specifies:
+#   - controller: Name of controller configuration
+#   - signal: Signal type for r generation ("step", "random")
+#   - io_data: Output CSV file path (will contain all inputs + output)
+#   - inputs_spec: Input specifications (each can be constant or filename)
+#
+# Input specifications (all optional with defaults):
+#   - y: measurement (default: 0.0)
+#   - uff: feedforward (default: 0.0)
+#   - uman: manual control (default: 0.0)
+#   - utrack: tracking signal (default: 0.0)
+#   - Tx: execution period (default: 1.0)
+#   - auto: automatic mode (default: true)
+#   - track: tracking mode (default: false)
 test_cases:
-  - name: P_step
+  P_step:
     controller: P
-    signal: step
-    file: data/P_step.csv
+    io_data: data/P_step.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: 0.0
+      utrack: 0.0
+      Tx: 1.0
+      auto: true
+      track: false
 
-  - name: PI_step
+  PI_step:
     controller: PI
-    signal: step
-    file: data/PI_step.csv
+    io_data: data/PI_step.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: 0.0
+      utrack: 0.0
+      Tx: 1.0
+      auto: true
+      track: false
 
-  - name: PID_step
+  PID_step:
     controller: PID
-    signal: step
-    file: data/PID_step.csv
+    io_data: data/PID_step.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: 0.0
+      utrack: 0.0
+      Tx: 1.0
+      auto: true
+      track: false
 
-  - name: PID_antiwindup_step
+  PID_antiwindup_step:
     controller: PID_saturated
-    signal: step
-    file: data/PID_antiwindup_step.csv
+    io_data: data/PID_antiwindup_step.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: 0.0
+      utrack: 0.0
+      Tx: 1.0
+      auto: true
+      track: false
 
-  - name: P_random
-    controller: P
-    signal: random
-    file: data/P_random.csv
-
-  - name: PI_random
+  PI_switch_manual:
     controller: PI
-    signal: random
-    file: data/PI_random.csv
+    io_data: data/PI_switch_manual.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: random_2.csv.csv
+      utrack: 0.0
+      Tx: 1.0
+      auto: true_to_false.csv
+      track: false
 
-  - name: PID_random
-    controller: PID
-    signal: random
-    file: data/PID_random.csv
-
-  - name: PID_antiwindup_random
-    controller: PID_saturated
-    signal: random
-    file: data/PID_antiwindup_random.csv
+  PI_switch_track:
+    controller: PI
+    io_data: data/PI_switch_track.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: 0.0
+      utrack: random_2.csv.csv
+      Tx: 1.0
+      auto: true
+      track: false_to_true.csv
