@@ -22,9 +22,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from python_pid import PIDController
 
 
-def load_test_config(yaml_file="tests/test_cases.yaml"):
+def load_test_config(tests_dir, filename="test_cases.yaml"):
     """Load test configuration from YAML file."""
-    with open(yaml_file, "r", encoding="utf-8") as f:
+    with open(Path(tests_dir) / filename, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
     return config
 
@@ -72,10 +72,24 @@ def generate_bool_sequence(initial_value, switch_index, length=10):
     Returns:
         list: Boolean values
     """
-    signal = [initial_value] * switch_index + [
-        not initial_value
-    ] * (length - switch_index)
+    signal = [initial_value] * switch_index + [not initial_value] * (
+        length - switch_index
+    )
     return signal
+
+
+def generate_irregular_time_intervals(sigma=0.5, length=10):
+    """Generate sample times with irregular intervals.
+
+    Args:
+        t_start: First sample time (default: 0.0)
+        length: Number of samples (default: 10)
+
+    Returns:
+        list: Signal values
+    """
+    time_intervals = np.random.lognormal(mean=0.0, sigma=sigma, size=length)
+    return time_intervals.tolist()
 
 
 def save_signal_csv(filepath, values):
@@ -95,13 +109,13 @@ def save_signal_csv(filepath, values):
 
 
 def load_signal_csv(filepath):
-    """Load signal values from CSV file.
+    """Load sequence of values from CSV file.
 
     Args:
         filepath: Path to CSV file
 
     Returns:
-        list: Signal values
+        list: Values
     """
     values = []
     with open(filepath, "r", encoding="utf-8") as f:
@@ -117,7 +131,7 @@ def load_signal_csv(filepath):
     return values
 
 
-def generate_base_signals(base_dir="tests", length=10):
+def generate_base_signals(data_dir, length=10):
     """Generate base signal sequences.
 
     Creates:
@@ -131,33 +145,36 @@ def generate_base_signals(base_dir="tests", length=10):
         base_dir: Base directory for tests
         length: Number of samples in each signal
     """
-    base_path = Path(base_dir)
-    base_path.mkdir(exist_ok=True)
+    data_dir = Path(data_dir)
+    data_dir.mkdir(exist_ok=True)
 
     # Generate step signal
     step_values = generate_step_signal(length)
-    save_signal_csv(base_path / "step.csv", step_values)
-    print(f"Generated: {base_path / 'step.csv'}")
+    save_signal_csv(data_dir / "step.csv", step_values)
+    print(f"Generated: {data_dir / 'step.csv'}")
 
     # Generate random signals
-    np.random.seed(42)
-    random_1 = np.random.randn(length).tolist()
-    save_signal_csv(base_path / "random_1.csv", random_1)
-    print(f"Generated: {base_path / 'random_1.csv'}")
+    random_1 = generate_random_signal(length=length, seed=42)
+    save_signal_csv(data_dir / "random_1.csv", random_1)
+    print(f"Generated: {data_dir / 'random_1.csv'}")
 
-    np.random.seed(43)
-    random_2 = np.random.randn(length).tolist()
-    save_signal_csv(base_path / "random_2.csv", random_2)
-    print(f"Generated: {base_path / 'random_2.csv'}")
+    random_2 = generate_random_signal(length=length, seed=43)
+    save_signal_csv(data_dir / "random_2.csv", random_2)
+    print(f"Generated: {data_dir / 'random_2.csv'}")
 
     # Generate boolean sequences
-    true_to_false = generate_bool_sequence(True, 5, length)
-    save_signal_csv(base_path / "true_to_false.csv", true_to_false)
-    print(f"Generated: {base_path / 'true_to_false.csv'}")
+    true_to_false = generate_bool_sequence(True, 5, length=length)
+    save_signal_csv(data_dir / "true_to_false.csv", true_to_false)
+    print(f"Generated: {data_dir / 'true_to_false.csv'}")
 
-    false_to_true = generate_bool_sequence(False, 5, length)
-    save_signal_csv(base_path / "false_to_true.csv", false_to_true)
-    print(f"Generated: {base_path / 'false_to_true.csv'}\n")
+    false_to_true = generate_bool_sequence(False, 5, length=length)
+    save_signal_csv(data_dir / "false_to_true.csv", false_to_true)
+    print(f"Generated: {data_dir / 'false_to_true.csv'}\n")
+
+    # Generate irregular time samples
+    irregular_time = generate_irregular_time_intervals(length=length)
+    save_signal_csv(data_dir / "irregular_time.csv", irregular_time)
+    print(f"Generated: {data_dir / 'irregular_time.csv'}")
 
 
 def get_input_values(spec, length, base_path):
@@ -188,7 +205,7 @@ def get_input_values(spec, length, base_path):
         raise ValueError(f"Invalid input specification: {spec}")
 
 
-def generate_io_data_files(config, base_dir="tests", length=10):
+def generate_io_data_files(config, data_dir, length=10):
     """Generate I/O data files for each test case.
 
     Args:
@@ -196,9 +213,7 @@ def generate_io_data_files(config, base_dir="tests", length=10):
         base_dir: Base directory for tests
         length: Number of samples
     """
-    base_path = Path(base_dir)
-    data_path = base_path / "data"
-    data_path.mkdir(exist_ok=True)
+    data_dir = Path(data_dir)
 
     controllers = config["controllers"]
     test_cases = config["test_cases"]
@@ -206,36 +221,35 @@ def generate_io_data_files(config, base_dir="tests", length=10):
     # Generate I/O data for each test case
     for test_name, test_spec in test_cases.items():
         controller_name = test_spec["controller"]
-        io_data_file = base_path / test_spec["io_data"]
+        io_data_file = data_dir / test_spec["io_data"]
         inputs_spec = test_spec.get("inputs_spec", {})
 
         # Get controller configuration
         ctrl_config = controllers[controller_name]
 
         # Load or generate input signals
-        r_values = get_input_values(
-            inputs_spec.get("r"), length, base_path
-        )
+        t_values = inputs_spec.get("t")
+        r_values = get_input_values(inputs_spec.get("r"), length, data_dir)
         y_values = get_input_values(
-            inputs_spec.get("y", 0.0), length, base_path
+            inputs_spec.get("y", 0.0), length, data_dir
         )
         uff_values = get_input_values(
-            inputs_spec.get("uff", 0.0), length, base_path
+            inputs_spec.get("uff", 0.0), length, data_dir
         )
         uman_values = get_input_values(
-            inputs_spec.get("uman", 0.0), length, base_path
+            inputs_spec.get("uman", 0.0), length, data_dir
         )
         utrack_values = get_input_values(
-            inputs_spec.get("utrack", 0.0), length, base_path
+            inputs_spec.get("utrack", 0.0), length, data_dir
         )
         Tx_values = get_input_values(
-            inputs_spec.get("Tx", 1.0), length, base_path
+            inputs_spec.get("Tx", 1.0), length, data_dir
         )
         auto_values = get_input_values(
-            inputs_spec.get("auto", True), length, base_path
+            inputs_spec.get("auto", True), length, data_dir
         )
         track_values = get_input_values(
-            inputs_spec.get("track", False), length, base_path
+            inputs_spec.get("track", False), length, data_dir
         )
 
         # Create controller
@@ -282,20 +296,22 @@ def generate_io_data_files(config, base_dir="tests", length=10):
         print(f"  Controller: {controller_name}")
         print(f"  Samples: {length}\n")
 
-    print(f"✓ Generated {len(test_cases)} I/O data files in {data_path}")
+    print(f"✓ Generated {len(test_cases)} I/O data files in {data_dir}")
 
 
 if __name__ == "__main__":
     # Configuration
     LENGTH = 10  # Number of samples in each sequence
+    tests_dir = Path("tests")
+    data_dir = tests_dir / "data"
 
     print("Step 1: Generating base signal sequences...\n")
-    generate_base_signals(base_dir="tests", length=LENGTH)
+    generate_base_signals(data_dir, length=LENGTH)
 
     print("Step 2: Loading test configuration...\n")
-    config = load_test_config()
+    config = load_test_config(tests_dir, filename="test_cases.yaml")
 
     print("Step 3: Generating I/O data files...\n")
-    generate_io_data_files(config, base_dir="tests", length=LENGTH)
+    generate_io_data_files(config, data_dir, length=LENGTH)
 
     print("\n✓ All files generated successfully!")

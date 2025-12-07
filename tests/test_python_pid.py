@@ -84,21 +84,19 @@ TEST_CASES = load_test_cases()
 
 
 @pytest.mark.parametrize("test_case", TEST_CASES, ids=lambda x: x["name"])
-def test_pid_controller(test_case):
+def test_pid_controller(test_case, tests_dir="tests", data_dir="data"):
     """Test PID controller with comprehensive input-output data.
 
     Loads complete I/O data from CSV (r, y, uff, uman, utrack, Tx,
     auto, track, u) and verifies controller produces expected outputs.
     """
-    # Get CSV file path
-    csv_file = Path(__file__).parent / test_case["io_data"]
+    tests_dir = Path(tests_dir)
 
-    # Skip if CSV file doesn't exist yet
-    if not csv_file.exists():
-        pytest.skip(f"I/O data file not found: {csv_file}")
+    # Create CSV file path
+    csv_filepath = tests_dir / data_dir / test_case["io_data"]
 
     # Load complete I/O data
-    data = load_io_data(csv_file)
+    data = load_io_data(csv_filepath)
 
     # Get controller configuration
     ctrl = test_case["controller"]

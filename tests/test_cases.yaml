@@ -39,7 +39,7 @@ controllers:
 # Each test case specifies:
 #   - controller: Name of controller configuration
 #   - signal: Signal type for r generation ("step", "random")
-#   - io_data: Output CSV file path (will contain all inputs + output)
+#   - io_data: Output CSV filename (will contain all inputs + output)
 #   - inputs_spec: Input specifications (each can be constant or filename)
 #
 # Input specifications (all optional with defaults):
@@ -53,7 +53,7 @@ controllers:
 test_cases:
   P_step:
     controller: P
-    io_data: data/P_step.csv
+    io_data: P_step.csv
     inputs_spec:
       r: step.csv
       y: random_1.csv
@@ -66,7 +66,7 @@ test_cases:
 
   PI_step:
     controller: PI
-    io_data: data/PI_step.csv
+    io_data: PI_step.csv
     inputs_spec:
       r: step.csv
       y: random_1.csv
@@ -79,7 +79,7 @@ test_cases:
 
   PID_step:
     controller: PID
-    io_data: data/PID_step.csv
+    io_data: PID_step.csv
     inputs_spec:
       r: step.csv
       y: random_1.csv
@@ -90,9 +90,22 @@ test_cases:
       auto: true
       track: false
 
+  PID_step_irregular_time:
+    controller: PID
+    io_data: PID_step_irregular_time.csv
+    inputs_spec:
+      r: step.csv
+      y: random_1.csv
+      uff: 0.0
+      uman: 0.0
+      utrack: 0.0
+      Tx: irregular_time.csv
+      auto: true
+      track: false
+
   PID_antiwindup_step:
     controller: PID_saturated
-    io_data: data/PID_antiwindup_step.csv
+    io_data: PID_antiwindup_step.csv
     inputs_spec:
       r: step.csv
       y: random_1.csv
@@ -105,7 +118,7 @@ test_cases:
 
   PI_switch_manual:
     controller: PI
-    io_data: data/PI_switch_manual.csv
+    io_data: PI_switch_manual.csv
     inputs_spec:
       r: step.csv
       y: random_1.csv
@@ -118,7 +131,7 @@ test_cases:
 
   PI_switch_track:
     controller: PI
-    io_data: data/PI_switch_track.csv
+    io_data: PI_switch_track.csv
     inputs_spec:
       r: step.csv
       y: random_1.csv
