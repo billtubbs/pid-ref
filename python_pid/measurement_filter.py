@@ -13,8 +13,9 @@ def filter_update(
 ):
     """Pure function for measurement filter update.
 
-    This is a standalone function implementing the second-order
-    measurement filter with automatic re-discretization.
+    This is a standalone function implementing critically-damped
+    second-order filter measurement filter with automatic
+    re-discretization.
 
     Args:
         y: Process measurement

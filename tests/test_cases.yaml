@@ -1,0 +1,78 @@
+# PID Controller Test Cases
+# Organized into two sections: controllers and test_cases
+
+# Controller configurations
+controllers:
+  P:
+    description: "P-only controller"
+    kp: 1.0
+    ki: 0.0
+    kd: 0.0
+    umin: -10.0
+    umax: 10.0
+
+  PI:
+    description: "PI controller"
+    kp: 1.0
+    ki: 0.5
+    kd: 0.0
+    umin: -10.0
+    umax: 10.0
+
+  PID:
+    description: "PID controller"
+    kp: 1.0
+    ki: 0.5
+    kd: 0.1
+    umin: -10.0
+    umax: 10.0
+
+  PID_saturated:
+    description: "PID controller with tight saturation limits"
+    kp: 2.0
+    ki: 1.0
+    kd: 0.2
+    umin: -3.0
+    umax: 3.0
+
+# Test cases
+test_cases:
+  - name: P_step
+    controller: P
+    signal: step
+    file: data/P_step.csv
+
+  - name: PI_step
+    controller: PI
+    signal: step
+    file: data/PI_step.csv
+
+  - name: PID_step
+    controller: PID
+    signal: step
+    file: data/PID_step.csv
+
+  - name: PID_antiwindup_step
+    controller: PID_saturated
+    signal: step
+    file: data/PID_antiwindup_step.csv
+
+  - name: P_random
+    controller: P
+    signal: random
+    file: data/P_random.csv
+
+  - name: PI_random
+    controller: PI
+    signal: random
+    file: data/PI_random.csv
+
+  - name: PID_random
+    controller: PID
+    signal: random
+    file: data/PID_random.csv
+
+  - name: PID_antiwindup_random
+    controller: PID_saturated
+    signal: random
+    file: data/PID_antiwindup_random.csv
