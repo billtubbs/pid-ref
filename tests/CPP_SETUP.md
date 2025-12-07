@@ -1,19 +1,43 @@
-# C++ Tests Setup Guide for VS Code on macOS
+# C++ Tests Setup Guide for VS Code
 
-This guide shows you how to compile and run the C++ PID controller tests in VS Code.
+This guide shows you how to compile and run the C++ PID controller tests in VS Code on macOS, Linux, and Windows.
 
 ## Prerequisites
 
+### macOS
 1. **Xcode Command Line Tools** (provides clang++ compiler):
    ```bash
    xcode-select --install
    ```
 
-2. **VS Code Extensions** (install via Extensions panel):
-   - C/C++ (by Microsoft)
-   - C/C++ Extension Pack (by Microsoft)
+### Linux
+1. **GCC/G++** compiler:
+   ```bash
+   sudo apt install build-essential  # Ubuntu/Debian
+   sudo yum install gcc-c++ make     # RedHat/CentOS
+   ```
+
+### Windows
+1. **Option A - WSL (Recommended)**:
+   - Install WSL2 and Ubuntu
+   - Follow Linux instructions above
+
+2. **Option B - MinGW**:
+   - Install MinGW-w64
+   - Add to PATH
+
+3. **Option C - Visual Studio**:
+   - Install Visual Studio with C++ tools
+   - Use CMake or VS projects instead of Makefile
+
+### All Platforms
+**VS Code Extensions** (install via Extensions panel):
+- C/C++ (by Microsoft)
+- C/C++ Extension Pack (by Microsoft)
 
 ## Quick Setup
+
+### macOS / Linux
 
 Run the automated setup script:
 
@@ -22,7 +46,16 @@ cd tests
 ./setup_cpp_tests.sh
 ```
 
-This will:
+### Windows
+
+Run the batch script:
+
+```cmd
+cd tests
+setup_cpp_tests.bat
+```
+
+These scripts will:
 - Download Catch2 test framework header
 - Generate I/O data files if needed
 - Show next steps
