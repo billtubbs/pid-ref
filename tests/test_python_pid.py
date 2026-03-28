@@ -136,6 +136,14 @@ def test_pid_controller(test_case, tests_dir="tests", data_dir="data"):
     )
 
 
+def test_pid_controller_repr():
+    controller = PIDController(kp=1.0, ki=0.5, kd=0.1, umin=-10.0, umax=10.0)
+    assert repr(controller) == (
+        "PIDRegulator(kp=1.0, ki=0.5, kd=0.1, TfTs=10.0, umin=-10.0, umax=10.0, "
+        "u0=0.0, b=1.0)"
+    )
+
+
 if __name__ == "__main__":
     # Run tests with pytest
     pytest.main([__file__, "-v"])
