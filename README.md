@@ -62,6 +62,20 @@ Runtime execution loop. This file demonstrates how to integrate the PID controll
 - Calling the PID controller update function
 - Implementing a sleep mechanism to maintain the desired sample rate
 
+## Installation
+
+To install the Python implementation:
+
+```bash
+pip install git+https://github.com/billtubbs/pid-ref.git#subdirectory=python_pid
+```
+
+Or, if you have cloned this repository locally:
+
+```bash
+pip install -e pid-ref/python_pid
+```
+
 ## Python Implementation Usage Example
 
 This example demonstrates how to initialize a PI controller and set up
