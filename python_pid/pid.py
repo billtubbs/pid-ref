@@ -222,3 +222,10 @@ class PIDController:
         self.ud_old = 0.0
         self.uff_old = 0.0
         self.filter.reset()
+
+    def __repr__(self):
+        return (
+            f"PIDRegulator(kp={self.kp}, ki={self.ki}, kd={self.kd}, "
+            f"TfTs={self.filter.TfTs}, umin={self.umin}, umax={self.umax}, "
+            f"u0={self.u0}, b={self.b})"
+        )
