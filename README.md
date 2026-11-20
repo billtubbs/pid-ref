@@ -67,13 +67,13 @@ Runtime execution loop. This file demonstrates how to integrate the PID controll
 To install the Python implementation:
 
 ```bash
-pip install git+https://github.com/billtubbs/pid-ref.git#subdirectory=python_pid
+pip install git+https://github.com/billtubbs/pid-ref.git
 ```
 
 Or, if you have cloned this repository locally:
 
 ```bash
-pip install -e pid-ref/python_pid
+pip install -e .
 ```
 
 ## Python Implementation Usage Example
