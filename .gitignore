@@ -1,0 +1,24 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# C++ build artifacts
+*.o
+*.a
+*.so
+tests/test_cpp_pid
+tests/catch.hpp
+
+# IDE
+.vscode/
+
+# macOS
+.DS_Store
+
+# Python packaging
+*.egg-info/
+
+# Development dependencies
+requirements-dev.txt
